@@ -2124,10 +2124,10 @@ dump_lines (struct print_file_list *p, unsigned int start, unsigned int end)
    listing.  */
 
 static void
-show_line (bfd *abfd, asection *section, bfd_vma addr_offset)
+show_line (bfd *abfd, asection *section, bfd_vma addr_offset, const char* name)
 {
   const char *filename;
-  const char *functionname;
+  const char *functionname=name;
   unsigned int linenumber;
   unsigned int discriminator;
   bool reloc;
@@ -3210,7 +3210,8 @@ disassemble_bytes (struct disassemble_info *inf,
 		   bfd_vma stop_offset,
 		   bfd_vma rel_offset,
 		   arelent ***relppp,
-		   arelent **relppend)
+		   arelent **relppend,
+		   const char* name)
 {
   struct objdump_disasm_info *aux;
   asection *section;
@@ -3336,7 +3337,7 @@ disassemble_bytes (struct disassemble_info *inf,
 	  unsigned int pb = 0;
 
 	  if (with_line_numbers || with_source_code)
-	    show_line (aux->abfd, section, addr_offset);
+	    show_line (aux->abfd, section, addr_offset, name);
 
 	  if (no_addresses)
 	    printf ("\t");
@@ -3682,6 +3683,9 @@ disassemble_bytes (struct disassemble_info *inf,
   free (line_buffer);
   free (color_buffer);
 }
+
+extern void bfd_release
+  (bfd *, void *);
 
 static void
 disassemble_section (bfd *abfd, asection *section, void *inf)
@@ -4046,10 +4050,16 @@ disassemble_section (bfd *abfd, asection *section, void *inf)
 	      free (sf.buffer);
 	    }
 
+    if(elf_tdata (abfd)->dwarf1_find_line_info != NULL)
+    {
+      bfd_release (abfd, elf_tdata (abfd)->dwarf1_find_line_info);
+      elf_tdata (abfd)->dwarf1_find_line_info = NULL;
+    }
+      
 	  /* Add jumps to output.  */
 	  disassemble_bytes (pinfo, paux->disassemble_fn, insns, data,
 			     addr_offset, nextstop_offset,
-			     rel_offset, &rel_pp, rel_ppend);
+			     rel_offset, &rel_pp, rel_ppend, sym->name);
 
 	  /* Free jumps.  */
 	  while (detected_jumps)
