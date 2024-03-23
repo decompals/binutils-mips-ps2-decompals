@@ -290,17 +290,29 @@ parse_die (bfd *	     abfd,
    occurs; TRUE otherwise.  */
 
 static bool
-parse_line_table (struct dwarf1_debug* stash, struct dwarf1_unit* aUnit)
+parse_line_table (struct dwarf1_debug* stash, struct dwarf1_unit* aUnit, const char **functionname_ptr)
 {
   bfd_byte *xptr;
 
   /* Load the ".line" section from the bfd if we haven't already.  */
   if (stash->line_section == 0)
     {
-      asection *msec;
+      unsigned int i;
+      asection *msec = NULL;
       bfd_size_type size;
 
-      msec = bfd_get_section_by_name (stash->abfd, ".line");
+      for(i=0; i < stash->abfd->symcount; i++)
+      {
+        if(!strncmp(stash->syms[i]->name, ".line_", 6) && !strcmp(&stash->syms[i]->name[6], *functionname_ptr))
+        {
+          msec = stash->syms[i]->section;
+          break;
+        }
+      }
+
+      if(!msec)
+        msec = bfd_get_section_by_name (stash->abfd, ".line");
+
       if (! msec || (msec->flags & SEC_HAS_CONTENTS) == 0)
 	return false;
 
@@ -435,7 +447,7 @@ dwarf1_unit_find_nearest_line (struct dwarf1_debug* stash,
 
 	  if (! aUnit->linenumber_table)
 	    {
-	      if (! parse_line_table (stash, aUnit))
+	      if (! parse_line_table (stash, aUnit, functionname_ptr))
 		return false;
 	    }
 
@@ -495,21 +507,33 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
   unsigned long addr = (unsigned long)(offset + section->vma);
 
   *filename_ptr = NULL;
-  *functionname_ptr = NULL;
+  //*functionname_ptr = NULL;
   *linenumber_ptr = 0;
 
   if (! stash)
     {
-      asection *msec;
+      unsigned int i;
+      asection *msec = NULL;
       bfd_size_type size = sizeof (struct dwarf1_debug);
 
       stash = elf_tdata (abfd)->dwarf1_find_line_info
-	= (struct dwarf1_debug *) bfd_zalloc (abfd, size);
+	          = (struct dwarf1_debug *) bfd_zalloc (abfd, size);
 
       if (! stash)
-	return false;
+	      return false;
 
-      msec = bfd_get_section_by_name (abfd, ".debug");
+      for(i=0; i<abfd->symcount; i++)
+      {
+        if(!strncmp(symbols[i]->name, ".debug_", 7) && !strcmp(&symbols[i]->name[7], *functionname_ptr))
+        {
+          msec = symbols[i]->section;
+          break;
+        }
+      }
+
+      if(!msec)
+        msec = bfd_get_section_by_name (abfd, ".debug");
+      
       if (! msec
 	  || (msec->flags & SEC_HAS_CONTENTS) == 0)
 	/* No dwarf1 info.  Note that at this point the stash

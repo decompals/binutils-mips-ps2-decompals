@@ -5778,8 +5778,8 @@ _bfd_dwarf2_find_nearest_line_with_alt
   bool do_line;
 
   *filename_ptr = NULL;
-  if (functionname_ptr != NULL)
-    *functionname_ptr = NULL;
+  /*if (functionname_ptr != NULL)
+    *functionname_ptr = NULL;*/
   *linenumber_ptr = 0;
   if (discriminator_ptr)
     *discriminator_ptr = 0;
