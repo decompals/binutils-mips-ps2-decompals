@@ -116,6 +116,13 @@ START_RELOC_NUMBERS (elf_mips_reloc_type)
   RELOC_NUMBER (R_MIPS16_TLS_TPREL_LO16, 112)
   RELOC_NUMBER (R_MIPS16_PC16_S1, 113)
   FAKE_RELOC (R_MIPS16_max, 114)
+  /* This is used by a mips co-processor instruction.  */
+  RELOC_NUMBER (R_MIPS15_S3, 119)
+  /* These relocs are for the dvp.  */
+  RELOC_NUMBER (R_MIPS_DVP_11_PCREL, 120)
+  RELOC_NUMBER (R_MIPS_DVP_27_S4, 121)
+  RELOC_NUMBER (R_MIPS_DVP_11_S4, 122)
+  RELOC_NUMBER (R_MIPS_DVP_U15_S3, 123)
   /* These relocations are specific to VxWorks.  */
   RELOC_NUMBER (R_MIPS_COPY, 126)
   RELOC_NUMBER (R_MIPS_JUMP_SLOT, 127)
