@@ -189,9 +189,19 @@ segT
 subseg_new (const char *segname, subsegT subseg)
 {
   segT secptr;
+  int i;
 
   secptr = subseg_get (segname, 0);
   subseg_set_rest (secptr, subseg);
+
+  for(i=0; i<forced_align_section_count; i++)
+  {
+    if(!strcmp(segname, forced_align_section[i].name))
+    {
+      secptr->alignment_power = forced_align_section[i].align;
+      break;
+    }
+  }
   return secptr;
 }
 
@@ -201,9 +211,20 @@ segT
 subseg_force_new (const char *segname, subsegT subseg)
 {
   segT secptr;
+  int i;
 
   secptr = subseg_get (segname, 1);
   subseg_set_rest (secptr, subseg);
+
+  for(i=0; i<forced_align_section_count; i++)
+  {
+    if(!strcmp(segname, forced_align_section[i].name))
+    {
+      secptr->alignment_power = forced_align_section[i].align;
+      break;
+    }
+  }
+
   return secptr;
 }
 
