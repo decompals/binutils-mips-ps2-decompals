@@ -1137,6 +1137,7 @@ This program has absolutely no warranty.\n"));
 	  break;
 
 	case OPTION_ALIGN_SECTION:
+    int i;
     long val = 0;
     char *res = NULL;
     char *align = strchr(optarg, ':');
@@ -1147,7 +1148,7 @@ This program has absolutely no warranty.\n"));
     if(!align)
       as_fatal (_("Invalid format --align-section= option: `%s'"), optarg);
 
-    if((align[1] == '0') && (align[1] == 'x'))
+    if((align[1] == '0') && (align[2] == 'x'))
       val = strtol(&align[1], &res, 16);
     else
       val = strtol(&align[1], &res, 10);
@@ -1157,7 +1158,18 @@ This program has absolutely no warranty.\n"));
 
     memcpy(forced_align_section[forced_align_section_count].name, optarg, align-optarg);
     forced_align_section[forced_align_section_count].align = ffs(val)-1;
-    forced_align_section_count++;
+
+    for(i=0; i<forced_align_section_count; i++)
+    {
+      if(!strcmp(forced_align_section[forced_align_section_count].name, forced_align_section[i].name))
+      {
+        forced_align_section[i].align = forced_align_section[forced_align_section_count].align;
+        memset(&forced_align_section[forced_align_section_count], 0, sizeof(forced_align_sectionS));
+        break;
+      }
+    }
+    if(forced_align_section[forced_align_section_count].name[0] != '\0')
+      forced_align_section_count++;
 	  break;
 	}
     }
