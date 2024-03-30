@@ -292,6 +292,12 @@ struct relax_type
 };
 
 typedef struct relax_type relax_typeS;
+
+typedef struct
+{
+   char name[256];
+   int align;
+} forced_align_sectionS;
 
 /* main program "as.c" (command arguments etc).  */
 
@@ -360,6 +366,10 @@ COMMON int need_pass_2;
 COMMON int linkrelax;
 
 COMMON int do_not_pad_sections_to_alignment;
+
+#define FORCED_ALIGN_SECTION_MAX 16
+COMMON forced_align_sectionS forced_align_section[FORCED_ALIGN_SECTION_MAX];
+COMMON int forced_align_section_count;
 
 enum multibyte_input_handling
 {
