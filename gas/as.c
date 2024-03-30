@@ -1134,6 +1134,7 @@ This program has absolutely no warranty.\n"));
 	  break;
 
 	case OPTION_ALIGN_SECTION:
+    {
     int i;
     long val = 0;
     char *res = NULL;
@@ -1167,6 +1168,7 @@ This program has absolutely no warranty.\n"));
     }
     if(forced_align_section[forced_align_section_count].name[0] != '\0')
       forced_align_section_count++;
+    }
 	  break;
 	}
     }
