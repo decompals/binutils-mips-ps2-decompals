@@ -10,11 +10,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 - A `CHANGELOG.md` file.
 
+## [v0.4] - 2024-03-31
+
+### Fixed
+
+- Fix `NULL` pointer dereference on debug info parsing.
+
 ## [v0.3] - 2024-03-31
 
 ### Fixed
 
-- Fix issue with Github release
+- Fix issue with Github release.
 
 ## [v0.2] - 2024-03-31 [YANKED]
 
@@ -42,6 +48,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
-[v0.3]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.3...v0.2
+[v0.4]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.3...v0.4
+[v0.3]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.2...v0.3
 [v0.2]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/0e63db3...v0.2
 [v0.1]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/2f79f2e...v0.1
