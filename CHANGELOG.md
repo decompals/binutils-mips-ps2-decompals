@@ -20,9 +20,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Added
 
-- Add `--align-section` option.
+- Add `--align-section=SECTION:ALIGN` option.
   - Allows to override the alignment of any given section.
-  - Up to 16 sections can be specified.
+  - Up to 16 sections can be specified by passing the flag multiple times.
   - If a section is specified more than once then the last alignment is used.
 
 ### Changed
