@@ -295,8 +295,8 @@ typedef struct relax_type relax_typeS;
 
 typedef struct
 {
-   char name[256];
-   int align;
+  char name[256];
+  int align;
 } forced_align_sectionS;
 
 /* main program "as.c" (command arguments etc).  */

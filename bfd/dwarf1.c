@@ -305,18 +305,18 @@ parse_line_table (struct dwarf1_debug* stash, struct dwarf1_unit* aUnit, const c
 
       if(*functionname_ptr)
       {
-        for(i=0; i < stash->abfd->symcount; i++)
-        {
-          if(!strncmp(stash->syms[i]->name, ".line_", 6) && !strcmp(&stash->syms[i]->name[6], *functionname_ptr))
-          {
-            msec = stash->syms[i]->section;
-            break;
-          }
-        }
+	for(i=0; i < stash->abfd->symcount; i++)
+	{
+	  if(!strncmp(stash->syms[i]->name, ".line_", 6) && !strcmp(&stash->syms[i]->name[6], *functionname_ptr))
+	  {
+	    msec = stash->syms[i]->section;
+	    break;
+	  }
+	}
       }
 
       if(!msec)
-        msec = bfd_get_section_by_name (stash->abfd, ".line");
+	msec = bfd_get_section_by_name (stash->abfd, ".line");
 
       if (! msec)
 	return false;
@@ -512,7 +512,6 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
   unsigned long addr = (unsigned long)(offset + section->vma);
 
   *filename_ptr = NULL;
-  //*functionname_ptr = NULL;
   *linenumber_ptr = 0;
 
   if (! stash)
@@ -523,26 +522,26 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
 
       memset(&_dwarf1_debug, 0, size);
       stash = elf_tdata (abfd)->dwarf1_find_line_info
-	          = &_dwarf1_debug;
+	= &_dwarf1_debug;
 
       if (! stash)
-	      return false;
+	return false;
 
       if(*functionname_ptr)
       {
-        for(i=0; i<abfd->symcount; i++)
-        {
-          if(!strncmp(symbols[i]->name, ".debug_", 7) && !strcmp(&symbols[i]->name[7], *functionname_ptr))
-          {
-            msec = symbols[i]->section;
-            break;
-          }
-        }
+	for(i=0; i<abfd->symcount; i++)
+	{
+	  if(!strncmp(symbols[i]->name, ".debug_", 7) && !strcmp(&symbols[i]->name[7], *functionname_ptr))
+	  {
+	    msec = symbols[i]->section;
+	    break;
+	  }
+	}
       }
 
       if(!msec)
-        msec = bfd_get_section_by_name (abfd, ".debug");
-      
+	msec = bfd_get_section_by_name (abfd, ".debug");
+
       if (! msec)
 	/* No dwarf1 info.  Note that at this point the stash
 	   has been allocated, but contains zeros, this lets
