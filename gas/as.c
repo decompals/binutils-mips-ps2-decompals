@@ -409,7 +409,7 @@ Options:\n\
                           for the output data column of the listing\n"));
   fprintf (stream, _("\
   --align-section=SECTION:ALIGN\n\
-			  align SECTION to ALIGN bytes\n"));
+                          align SECTION to ALIGN bytes\n"));
   fprintf (stream, _("\
   @FILE                   read options from FILE\n"));
 
@@ -1134,41 +1134,41 @@ This program has absolutely no warranty.\n"));
 	  break;
 
 	case OPTION_ALIGN_SECTION:
-    {
-    int i;
-    long val = 0;
-    char *res = NULL;
-    char *align = strchr(optarg, ':');
+	  {
+	    int i;
+	    long val = 0;
+	    char *res = NULL;
+	    char *align = strchr(optarg, ':');
 
-    if(forced_align_section_count >= FORCED_ALIGN_SECTION_MAX)
-      as_fatal (_("Too many --align-section= option: `%s'"), optarg);
+	    if(forced_align_section_count >= FORCED_ALIGN_SECTION_MAX)
+	      as_fatal (_("Too many --align-section= option: `%s'"), optarg);
 
-    if(!align)
-      as_fatal (_("Invalid format --align-section= option: `%s'"), optarg);
+	    if(!align)
+	      as_fatal (_("Invalid format --align-section= option: `%s'"), optarg);
 
-    if((align[1] == '0') && (align[2] == 'x'))
-      val = strtol(&align[1], &res, 16);
-    else
-      val = strtol(&align[1], &res, 10);
+	    if((align[1] == '0') && (align[2] == 'x'))
+	      val = strtol(&align[1], &res, 16);
+	    else
+	      val = strtol(&align[1], &res, 10);
 
-    if((res == NULL) || ((val & (val - 1)) != 0) || val == 0)
-      as_fatal (_("Invalid value --align-section= option: `%s'"), optarg);
+	    if((res == NULL) || ((val & (val - 1)) != 0) || val == 0)
+	      as_fatal (_("Invalid value --align-section= option: `%s'"), optarg);
 
-    memcpy(forced_align_section[forced_align_section_count].name, optarg, align-optarg);
-    forced_align_section[forced_align_section_count].align = ffs(val)-1;
+	    memcpy(forced_align_section[forced_align_section_count].name, optarg, align-optarg);
+	    forced_align_section[forced_align_section_count].align = ffs(val)-1;
 
-    for(i=0; i<forced_align_section_count; i++)
-    {
-      if(!strcmp(forced_align_section[forced_align_section_count].name, forced_align_section[i].name))
-      {
-        forced_align_section[i].align = forced_align_section[forced_align_section_count].align;
-        memset(&forced_align_section[forced_align_section_count], 0, sizeof(forced_align_sectionS));
-        break;
-      }
-    }
-    if(forced_align_section[forced_align_section_count].name[0] != '\0')
-      forced_align_section_count++;
-    }
+	    for(i=0; i<forced_align_section_count; i++)
+	      {
+	        if(!strcmp(forced_align_section[forced_align_section_count].name, forced_align_section[i].name))
+	          {
+	            forced_align_section[i].align = forced_align_section[forced_align_section_count].align;
+	            memset(&forced_align_section[forced_align_section_count], 0, sizeof(forced_align_sectionS));
+	            break;
+	          }
+	      }
+	    if(forced_align_section[forced_align_section_count].name[0] != '\0')
+	      forced_align_section_count++;
+	  }
 	  break;
 	}
     }
