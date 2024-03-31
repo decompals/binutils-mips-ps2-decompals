@@ -134,6 +134,8 @@ struct linenumber
 /* Find the form of an attr, from the attr field.  */
 #define FORM_FROM_ATTR(attr)	((attr) & 0xF)	/* Implicitly specified.  */
 
+static struct dwarf1_debug _dwarf1_debug;
+
 /* Return a newly allocated dwarf1_unit.  It should be cleared and
    then attached into the 'stash' at 'stash->lastUnit'.  */
 
@@ -516,8 +518,9 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
       asection *msec = NULL;
       bfd_size_type size = sizeof (struct dwarf1_debug);
 
+      memset(&_dwarf1_debug, 0, size);
       stash = elf_tdata (abfd)->dwarf1_find_line_info
-	          = (struct dwarf1_debug *) bfd_zalloc (abfd, size);
+	          = &_dwarf1_debug;
 
       if (! stash)
 	      return false;
