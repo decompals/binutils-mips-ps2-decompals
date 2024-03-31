@@ -42,5 +42,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
+[v0.3]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.3...v0.2
 [v0.2]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/0e63db3...v0.2
 [v0.1]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/2f79f2e...v0.1
