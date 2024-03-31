@@ -303,12 +303,15 @@ parse_line_table (struct dwarf1_debug* stash, struct dwarf1_unit* aUnit, const c
       asection *msec = NULL;
       bfd_size_type size;
 
-      for(i=0; i < stash->abfd->symcount; i++)
+      if(*functionname_ptr)
       {
-        if(!strncmp(stash->syms[i]->name, ".line_", 6) && !strcmp(&stash->syms[i]->name[6], *functionname_ptr))
+        for(i=0; i < stash->abfd->symcount; i++)
         {
-          msec = stash->syms[i]->section;
-          break;
+          if(!strncmp(stash->syms[i]->name, ".line_", 6) && !strcmp(&stash->syms[i]->name[6], *functionname_ptr))
+          {
+            msec = stash->syms[i]->section;
+            break;
+          }
         }
       }
 
@@ -525,12 +528,15 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
       if (! stash)
 	      return false;
 
-      for(i=0; i<abfd->symcount; i++)
+      if(*functionname_ptr)
       {
-        if(!strncmp(symbols[i]->name, ".debug_", 7) && !strcmp(&symbols[i]->name[7], *functionname_ptr))
+        for(i=0; i<abfd->symcount; i++)
         {
-          msec = symbols[i]->section;
-          break;
+          if(!strncmp(symbols[i]->name, ".debug_", 7) && !strcmp(&symbols[i]->name[7], *functionname_ptr))
+          {
+            msec = symbols[i]->section;
+            break;
+          }
         }
       }
 
