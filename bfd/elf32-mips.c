@@ -1661,6 +1661,21 @@ static reloc_howto_type elf_mips_eh_howto =
 	 0xffffffff,		/* dst_mask */
 	 false);		/* pcrel_offset */
 
+static reloc_howto_type elf_mips15_s3_howto =
+  HOWTO (R_MIPS15_S3,		/* type */
+	 3,			/* rightshift */
+	 2,			/* size (0 = byte, 1 = short, 2 = long) */
+	 15,			/* bitsize */
+	 false,			/* pc_relative */
+	 6,			/* bitpos */
+	 complain_overflow_bitfield, /* complain_on_overflow */
+	 bfd_elf_generic_reloc,	/* special_function */
+	 "R_MIPS15_S3",		/* name */
+	 true,			/* partial_inplace */
+	 0x001fffc0,		/* src_mask */
+	 0x001fffc0,		/* dst_mask */
+	 false);		/* pcrel_offset */
+
 /* Set the GP value for OUTPUT_BFD.  Returns FALSE if this is a
    dangerous relocation.  */
 
@@ -2229,6 +2244,8 @@ mips_elf32_rtype_to_howto (bfd *abfd,
       return &elf_mips_jump_slot_howto;
     case R_MIPS_EH:
       return &elf_mips_eh_howto;
+    case R_MIPS15_S3:
+      return &elf_mips15_s3_howto;
     default:
       if (r_type >= R_MICROMIPS_min && r_type < R_MICROMIPS_max)
 	howto = &elf_micromips_howto_table_rel[r_type - R_MICROMIPS_min];
