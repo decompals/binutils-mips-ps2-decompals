@@ -511,7 +511,6 @@ _bfd_dwarf1_find_nearest_line (bfd *abfd,
   unsigned long addr = (unsigned long)(offset + section->vma);
 
   *filename_ptr = NULL;
-  //*functionname_ptr = NULL;
   *linenumber_ptr = 0;
 
   if (! stash)

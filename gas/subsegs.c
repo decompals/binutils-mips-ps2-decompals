@@ -195,13 +195,13 @@ subseg_new (const char *segname, subsegT subseg)
   subseg_set_rest (secptr, subseg);
 
   for(i=0; i<forced_align_section_count; i++)
-  {
-    if(!strcmp(segname, forced_align_section[i].name))
     {
-      secptr->alignment_power = forced_align_section[i].align;
-      break;
+      if(!strcmp(segname, forced_align_section[i].name))
+	{
+	  secptr->alignment_power = forced_align_section[i].align;
+	  break;
+	}
     }
-  }
   return secptr;
 }
 
@@ -217,13 +217,13 @@ subseg_force_new (const char *segname, subsegT subseg)
   subseg_set_rest (secptr, subseg);
 
   for(i=0; i<forced_align_section_count; i++)
-  {
-    if(!strcmp(segname, forced_align_section[i].name))
     {
-      secptr->alignment_power = forced_align_section[i].align;
-      break;
+      if(!strcmp(segname, forced_align_section[i].name))
+	{
+	  secptr->alignment_power = forced_align_section[i].align;
+	  break;
+	}
     }
-  }
 
   return secptr;
 }

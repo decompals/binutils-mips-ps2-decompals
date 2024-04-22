@@ -7500,7 +7500,8 @@ _bfd_mips_elf_section_from_shdr (bfd *abfd,
 	return false;
       break;
     case SHT_MIPS_DEBUG:
-      if ((strcmp (name, ".mdebug") != 0) && (strcmp (name, ".debug") != 0) && (strcmp (name, ".line") != 0))
+      if ((strcmp (name, ".mdebug") != 0) && (strcmp (name, ".debug") != 0)
+	  && (strcmp (name, ".line") != 0))
 	return false;
       flags = SEC_DEBUGGING;
       break;
