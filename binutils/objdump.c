@@ -3668,9 +3668,6 @@ disassemble_bytes (struct disassemble_info *inf,
   free (color_buffer);
 }
 
-extern void bfd_release
-  (bfd *, void *);
-
 static void
 disassemble_section (bfd *abfd, asection *section, void *inf)
 {
@@ -4050,11 +4047,7 @@ disassemble_section (bfd *abfd, asection *section, void *inf)
 	      free (sf.buffer);
 	    }
 
-    if(elf_tdata (abfd)->dwarf1_find_line_info != NULL)
-    {
-      bfd_release (abfd, elf_tdata (abfd)->dwarf1_find_line_info);
-      elf_tdata (abfd)->dwarf1_find_line_info = NULL;
-    }
+    elf_tdata (abfd)->dwarf1_find_line_info = NULL;
       
 	  /* Add jumps to output.  */
 	  disassemble_bytes (pinfo, paux->disassemble_fn, insns, data,
