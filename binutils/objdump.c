@@ -4052,7 +4052,7 @@ disassemble_section (bfd *abfd, asection *section, void *inf)
 	  /* Add jumps to output.  */
 	  disassemble_bytes (pinfo, paux->disassemble_fn, insns, data,
 			     addr_offset, nextstop_offset,
-			     rel_offset, &rel_pp, rel_ppend, sym->name);
+			     rel_offset, &rel_pp, rel_ppend, (sym ? sym->name : NULL));
 
 	  /* Free jumps.  */
 	  while (detected_jumps)
