@@ -18,7 +18,8 @@ jobs:
 
     name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }} 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Install dependencies (Ubuntu)
         shell: bash
@@ -35,7 +36,7 @@ jobs:
       - name: Make
         shell: bash
         run: |
-          make CFLAGS="${{ matrix.TARGET.CFLAGS }}"
+          make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}"
 
       - name: Test for file
         shell: bash
@@ -70,14 +71,14 @@ jobs:
           tar -czf ${{ matrix.TARGET.ARCHIVE_NAME }} mips-ps2-decompals-ar mips-ps2-decompals-as mips-ps2-decompals-strip mips-ps2-decompals-objcopy mips-ps2-decompals-objdump mips-ps2-decompals-c++filt mips-ps2-decompals-nm
 
       - name: Upload archive
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: binutils-mips-ps2-decompals-${{ matrix.TARGET.OS }}-${{ matrix.TARGET.HOST }}
           path: |
             ${{ matrix.TARGET.ARCHIVE_NAME }}
 
       - name: Publish release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{ matrix.TARGET.ARCHIVE_NAME }}

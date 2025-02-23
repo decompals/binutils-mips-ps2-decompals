@@ -6,9 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.5] - 2025-02-23
+
 ### Added
 
 - A `CHANGELOG.md` file.
+- `objdump`: Add named registers support for EABI32 and EABI64.
+  - Backported from `binutils` commit `caaa18f2128471cfaeda047d0725bef08daeb510`.
 
 ## [v0.4] - 2024-03-31
 
@@ -48,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
+[v0.5]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.4...v0.5
 [v0.4]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.3...v0.4
 [v0.3]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.2...v0.3
 [v0.2]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/0e63db3...v0.2

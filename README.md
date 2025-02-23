@@ -11,9 +11,15 @@ to check the latest release.
 
 ## Features
 
+### `objdump`
+
 - Improved support for Codewarrior's MWCC produced objects.
   - Line number/debug support.
   - Support custom relocs emitted by MWCC, like `R_MIPS15_S3`.
+- Named registers supports for `eabi32` and `eabi64` ABIs.
+
+### `as`
+
 - Flag to override the alignment of any given section.
   - Syntax is `--align-section=SECTION:ALIGN`.
   - Allows to override the alignment of any given section.
