@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.6] - 2025-04-24
+
+### Added
+
+- Include more prebuilt binaries.
+  - Adds `addr2line`, `elfedit`, `ld`, `ranlib`, `readelf`, `size` and `strings`.
+
 ## [v0.5] - 2025-02-23
 
 ### Added
@@ -52,6 +59,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
+[v0.6]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.5...v0.6
 [v0.5]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.4...v0.5
 [v0.4]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.3...v0.4
 [v0.3]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.2...v0.3

@@ -16,7 +16,7 @@ jobs:
               ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz'
             }
 
-    name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }} 
+    name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -47,28 +47,24 @@ jobs:
       - name: Create release archive
         shell: bash
         run: |
-          cp binutils/ar mips-ps2-decompals-ar
-          cp gas/as-new mips-ps2-decompals-as
-          cp binutils/strip-new mips-ps2-decompals-strip
-          cp binutils/objcopy mips-ps2-decompals-objcopy
-          cp binutils/objdump mips-ps2-decompals-objdump
-          cp binutils/cxxfilt mips-ps2-decompals-c++filt
-          cp binutils/nm-new mips-ps2-decompals-nm
-          strip mips-ps2-decompals-ar
-          strip mips-ps2-decompals-as
-          strip mips-ps2-decompals-strip
-          strip mips-ps2-decompals-objcopy
-          strip mips-ps2-decompals-objdump
-          strip mips-ps2-decompals-c++filt
-          strip mips-ps2-decompals-nm
-          chmod +x mips-ps2-decompals-ar
-          chmod +x mips-ps2-decompals-as
-          chmod +x mips-ps2-decompals-strip
-          chmod +x mips-ps2-decompals-objcopy
-          chmod +x mips-ps2-decompals-objdump
-          chmod +x mips-ps2-decompals-c++filt
-          chmod +x mips-ps2-decompals-nm
-          tar -czf ${{ matrix.TARGET.ARCHIVE_NAME }} mips-ps2-decompals-ar mips-ps2-decompals-as mips-ps2-decompals-strip mips-ps2-decompals-objcopy mips-ps2-decompals-objdump mips-ps2-decompals-c++filt mips-ps2-decompals-nm
+          mkdir -p release
+          cp binutils/addr2line release/mips-ps2-decompals-addr2line
+          cp binutils/ar        release/mips-ps2-decompals-ar
+          cp gas/as-new         release/mips-ps2-decompals-as
+          cp binutils/cxxfilt   release/mips-ps2-decompals-c++filt
+          cp binutils/elfedit   release/mips-ps2-decompals-elfedit
+          cp ld/ld-new          release/mips-ps2-decompals-ld
+          cp binutils/nm-new    release/mips-ps2-decompals-nm
+          cp binutils/objcopy   release/mips-ps2-decompals-objcopy
+          cp binutils/objdump   release/mips-ps2-decompals-objdump
+          cp binutils/ranlib    release/mips-ps2-decompals-ranlib
+          cp binutils/readelf   release/mips-ps2-decompals-readelf
+          cp binutils/size      release/mips-ps2-decompals-size
+          cp binutils/strings   release/mips-ps2-decompals-strings
+          cp binutils/strip-new release/mips-ps2-decompals-strip
+          strip release/*
+          chmod +x release/*
+          cd release && tar -czf ../${{ matrix.TARGET.ARCHIVE_NAME }} *
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
