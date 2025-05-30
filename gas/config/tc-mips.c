@@ -1056,6 +1056,7 @@ static bool mips_ignore_branch_isa;
 #define RELAX_DELAY_SLOT_16BIT 0x200000
 #define RELAX_DELAY_SLOT_SIZE_FIRST 0x400000
 #define RELAX_DELAY_SLOT_SIZE_SECOND 0x800000
+#define RELAX_STORE_GP 0x1000000
 
 /* Branch without likely bit.  If label is out of range, we turn:
 
@@ -12497,7 +12498,17 @@ macro (struct mips_cl_insn *ip, char *str)
 	      macro_build (&offset_expr, s, fmt, op[0],
 			   BFD_RELOC_LO16, tempreg);
 	      if (mips_relax.sequence)
-		relax_end ();
+		{
+		  relax_end ();
+		  /* If we used at when we shouldn't then we mark the frag and
+		     pretend we actually didn't so md_estimate_size_before_relax
+		     can test for this and issue the real error there */
+		  if (used_at && !AT) 
+		    {
+		      mips_macro_warning.first_frag->fr_subtype |= RELAX_STORE_GP;
+		      used_at = 0;
+		    }
+		}
 	    }
 	  else
 	    {
@@ -18236,6 +18247,12 @@ md_estimate_size_before_relax (fragS *fragp, asection *segtype)
 
   if (change)
     {
+      if (fragp->fr_subtype & RELAX_STORE_GP) 
+        {
+	  as_bad_where (fragp->fr_file, fragp->fr_line, ("macro used $at after \".set noat\""));
+	  fragp->fr_subtype &= ~RELAX_STORE_GP;
+        }
+
       fragp->fr_subtype |= RELAX_USE_SECOND;
       return -RELAX_FIRST (fragp->fr_subtype);
     }
