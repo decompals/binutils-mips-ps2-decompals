@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [v0.7] - 2025-08-14
 
-### Added
+### Fixed
 
 - Defer at usage error check [#6](https://github.com/decompals/binutils-mips-ps2-decompals/pull/6).
   - Fixes an old issue were macro'd loads of a gp-reachable symbol would
