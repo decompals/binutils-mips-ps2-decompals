@@ -48,23 +48,11 @@
 
 #if defined (HANDLE_SIGNALS)
 
-#if !defined (RETSIGTYPE)
-#  if defined (VOID_SIGHANDLER)
-#    define RETSIGTYPE void
-#  else
-#    define RETSIGTYPE int
-#  endif /* !VOID_SIGHANDLER */
-#endif /* !RETSIGTYPE */
-
-#if defined (VOID_SIGHANDLER)
-#  define SIGHANDLER_RETURN return
-#else
-#  define SIGHANDLER_RETURN return (0)
-#endif
+#define SIGHANDLER_RETURN return
 
 /* This typedef is equivalent to the one for Function; it allows us
    to say SigHandler *foo = signal (SIGKILL, SIG_IGN); */
-typedef RETSIGTYPE SigHandler ();
+typedef void SigHandler (int);
 
 #if defined (HAVE_POSIX_SIGNALS)
 typedef struct sigaction sighandler_cxt;
@@ -78,12 +66,12 @@ typedef struct { SigHandler *sa_handler; int sa_mask, sa_flags; } sighandler_cxt
 #  define SA_RESTART 0
 #endif
 
-static SigHandler *rl_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
-static void rl_maybe_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
-static void rl_maybe_restore_sighandler PARAMS((int, sighandler_cxt *));
+static SigHandler *rl_set_sighandler (int, SigHandler *, sighandler_cxt *);
+static void rl_maybe_set_sighandler (int, SigHandler *, sighandler_cxt *);
+static void rl_maybe_restore_sighandler (int, sighandler_cxt *);
 
-static RETSIGTYPE rl_signal_handler PARAMS((int));
-static RETSIGTYPE _rl_handle_signal PARAMS((int));
+static void rl_signal_handler (int);
+static void _rl_handle_signal (int);
      
 /* Exported variables for use by applications. */
 
@@ -136,7 +124,7 @@ void *_rl_sigcleanarg;
 /* Readline signal handler functions. */
 
 /* Called from RL_CHECK_SIGNALS() macro to run signal handling code. */
-RETSIGTYPE
+void
 _rl_signal_handler (int sig)
 {
   _rl_caught_signal = 0;	/* XXX */
@@ -163,7 +151,7 @@ _rl_signal_handler (int sig)
   SIGHANDLER_RETURN;
 }
 
-static RETSIGTYPE
+static void
 rl_signal_handler (int sig)
 {
   _rl_caught_signal = sig;
@@ -173,7 +161,7 @@ rl_signal_handler (int sig)
 /* This is called to handle a signal when it is safe to do so (out of the
    signal handler execution path). Called by _rl_signal_handler for all the
    signals readline catches except SIGWINCH. */
-static RETSIGTYPE
+static void
 _rl_handle_signal (int sig)
 {
   int block_sig;
@@ -330,7 +318,7 @@ _rl_handle_signal (int sig)
 }
 
 #if defined (SIGWINCH)
-static RETSIGTYPE
+static void
 rl_sigwinch_handler (int sig)
 {
   SigHandler *oh;
