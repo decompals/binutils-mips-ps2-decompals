@@ -17,6 +17,7 @@ to check the latest release.
   - Line number/debug support.
   - Support custom relocs emitted by MWCC, like `R_MIPS15_S3`.
 - Named registers supports for `eabi32` and `eabi64` ABIs.
+- Support for DVP relocations.
 
 ### `as`
 

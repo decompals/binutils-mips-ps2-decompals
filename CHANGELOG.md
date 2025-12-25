@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.8] - 2025-12-25
+
+### Added
+
+- Implement DVP relocations in elf32-mips.c [#8](https://github.com/decompals/binutils-mips-ps2-decompals/pull/8).
+  - Add support for DVP relocation types and handling for MIPS ELF.
+
+### Fixed
+
+- Fix various GCC 15 compilation errors [#7](https://github.com/decompals/binutils-mips-ps2-decompals/pull/7)
+
 ## [v0.7] - 2025-08-14
 
 ### Fixed
