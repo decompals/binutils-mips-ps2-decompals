@@ -15,6 +15,13 @@ jobs:
               HOST: 'i386-pc-linux',
               ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz'
             }
+          - {
+              OS: 'macos-latest',
+              CFLAGS: '',
+              HOST: 'aarch64-apple-darwin',
+              BUILD: 'aarch64-apple-darwin',
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz'
+            }
 
     name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
     steps:
@@ -28,15 +35,36 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential bison libmpfr-dev
 
-      - name: Configure for mips
+      - name: Install dependencies (macOS)
         shell: bash
+        if: matrix.TARGET.OS == 'macos-latest'
+        run: |
+          brew update
+          brew install bison texinfo
+
+      - name: Configure for mips (Ubuntu)
+        shell: bash
+        if: matrix.TARGET.OS == 'ubuntu-latest'
         run: |
           ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
 
+      - name: Configure for mips (macOS)
+        shell: bash
+        if: matrix.TARGET.OS == 'macos-latest'
+        run: |
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --with-system-zlib --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2
+
       - name: Make
         shell: bash
+        if: matrix.TARGET.OS == 'ubuntu-latest'
         run: |
           make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}"
+
+      - name: Make
+        shell: bash
+        if: matrix.TARGET.OS == 'macos-latest'
+        run: |
+          make -j $(sysctl -n hw.ncpu)
 
       - name: Test for file
         shell: bash
