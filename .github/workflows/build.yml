@@ -22,6 +22,14 @@ jobs:
               BUILD: 'aarch64-apple-darwin',
               ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz'
             }
+          - {
+              OS: 'windows-latest',
+              CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              LDFLAGS: '-static -static-libgcc -static-libstdc++',
+              HOST: 'x86_64-w64-mingw32',
+              MSYSTEM: 'MINGW64',
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip'
+            }
 
     name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
     steps:
@@ -42,6 +50,14 @@ jobs:
           brew update
           brew install bison texinfo
 
+      - name: Install dependencies (Windows)
+        uses: msys2/setup-msys2@v2
+        if: matrix.TARGET.OS == 'windows-latest'
+        with:
+          msystem: ${{ matrix.TARGET.MSYSTEM }}
+          install: bison diffutils file flex gawk make patch perl texinfo zip
+          pacboy: toolchain:p
+
       - name: Configure for mips (Ubuntu)
         shell: bash
         if: matrix.TARGET.OS == 'ubuntu-latest'
@@ -53,6 +69,12 @@ jobs:
         if: matrix.TARGET.OS == 'macos-latest'
         run: |
           ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --with-system-zlib --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2
+
+      - name: Configure for mips (Windows)
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
+        run: |
+          ./configure --target=mips --prefix=/opt/cross --disable-gprof --disable-gprofng --disable-gdb --disable-werror --disable-nls --without-zstd --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
 
       - name: Make
         shell: bash
@@ -66,14 +88,29 @@ jobs:
         run: |
           make -j $(sysctl -n hw.ncpu)
 
+      - name: Make
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
+        run: |
+          make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" MAKEINFO=true
+
       - name: Test for file
         shell: bash
+        if: matrix.TARGET.OS != 'windows-latest'
         run: |
           test -f binutils/ar
           file binutils/ar
 
+      - name: Test for file (Windows)
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
+        run: |
+          test -f binutils/ar.exe
+          file binutils/ar.exe
+
       - name: Create release archive
         shell: bash
+        if: matrix.TARGET.OS != 'windows-latest'
         run: |
           mkdir -p release
           cp binutils/addr2line release/mips-ps2-decompals-addr2line
@@ -93,6 +130,28 @@ jobs:
           strip release/*
           chmod +x release/*
           cd release && tar -czf ../${{ matrix.TARGET.ARCHIVE_NAME }} *
+
+      - name: Create release archive (Windows)
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
+        run: |
+          mkdir -p release
+          cp binutils/addr2line.exe release/mips-ps2-decompals-addr2line.exe
+          cp binutils/ar.exe        release/mips-ps2-decompals-ar.exe
+          cp gas/as-new.exe         release/mips-ps2-decompals-as.exe
+          cp binutils/cxxfilt.exe   release/mips-ps2-decompals-c++filt.exe
+          cp binutils/elfedit.exe   release/mips-ps2-decompals-elfedit.exe
+          cp ld/ld-new.exe          release/mips-ps2-decompals-ld.exe
+          cp binutils/nm-new.exe    release/mips-ps2-decompals-nm.exe
+          cp binutils/objcopy.exe   release/mips-ps2-decompals-objcopy.exe
+          cp binutils/objdump.exe   release/mips-ps2-decompals-objdump.exe
+          cp binutils/ranlib.exe    release/mips-ps2-decompals-ranlib.exe
+          cp binutils/readelf.exe   release/mips-ps2-decompals-readelf.exe
+          cp binutils/size.exe      release/mips-ps2-decompals-size.exe
+          cp binutils/strings.exe   release/mips-ps2-decompals-strings.exe
+          cp binutils/strip-new.exe release/mips-ps2-decompals-strip.exe
+          strip release/*
+          cd release && zip -9 ../${{ matrix.TARGET.ARCHIVE_NAME }} *
 
       - name: Upload archive
         uses: actions/upload-artifact@v4
