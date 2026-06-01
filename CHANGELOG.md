@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.9] - 2025-12-25
+
+### Added
+
+- Add prebuilt binaries for MacOS ARM64 and Windows.
+
 ## [v0.8] - 2025-12-25
 
 ### Added
@@ -78,6 +84,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
+[v0.9]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.8...v0.9
+[v0.8]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.7...v0.8
 [v0.7]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.6...v0.7
 [v0.6]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.5...v0.6
 [v0.5]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.4...v0.5
