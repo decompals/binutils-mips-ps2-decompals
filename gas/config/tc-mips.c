@@ -980,6 +980,10 @@ static int mips_relax_branch;
    Needed for broken assembly produced by some GCC versions and some
    sloppy code out there, where branches to data labels are present.  */
 static bool mips_ignore_branch_isa;
+
+/* True if branch relocations should be kept for global symbols.
+   This preserves the default ELF behavior.  */
+static bool mips_branch_relocs = true;
 
 /* The expansion of many macros depends on the type of symbol that
    they refer to.  For example, when generating position-dependent code,
@@ -1538,6 +1542,8 @@ enum options
     OPTION_NO_RELAX_BRANCH,
     OPTION_IGNORE_BRANCH_ISA,
     OPTION_NO_IGNORE_BRANCH_ISA,
+    OPTION_BRANCH_RELOCS,
+    OPTION_NO_BRANCH_RELOCS,
     OPTION_INSN32,
     OPTION_NO_INSN32,
     OPTION_MSHARED,
@@ -1694,6 +1700,8 @@ struct option md_longopts[] =
   {"no-relax-branch", no_argument, NULL, OPTION_NO_RELAX_BRANCH},
   {"mignore-branch-isa", no_argument, NULL, OPTION_IGNORE_BRANCH_ISA},
   {"mno-ignore-branch-isa", no_argument, NULL, OPTION_NO_IGNORE_BRANCH_ISA},
+  {"mbranch-relocs", no_argument, NULL, OPTION_BRANCH_RELOCS},
+  {"mno-branch-relocs", no_argument, NULL, OPTION_NO_BRANCH_RELOCS},
   {"minsn32", no_argument, NULL, OPTION_INSN32},
   {"mno-insn32", no_argument, NULL, OPTION_NO_INSN32},
   {"mshared", no_argument, NULL, OPTION_MSHARED},
@@ -15054,6 +15062,14 @@ md_parse_option (int c, const char *arg)
       mips_ignore_branch_isa = false;
       break;
 
+    case OPTION_BRANCH_RELOCS:
+      mips_branch_relocs = true;
+      break;
+
+    case OPTION_NO_BRANCH_RELOCS:
+      mips_branch_relocs = false;
+      break;
+
     case OPTION_INSN32:
       file_mips_opts.insn32 = true;
       break;
@@ -15526,7 +15542,14 @@ int
 mips_force_relocation (fixS *fixp)
 {
   if (generic_force_reloc (fixp))
-    return 1;
+    {
+      if (mips_branch_relocs
+	  || fixp->fx_r_type != BFD_RELOC_16_PCREL_S2
+	  || fixp->fx_addsy == NULL
+	  || S_FORCE_RELOC (fixp->fx_addsy, 0)
+	  || S_IS_WEAK (fixp->fx_addsy))
+	return 1;
+    }
 
   /* We want to keep BFD_RELOC_MICROMIPS_*_PCREL_S1 relocation,
      so that the linker relaxation can update targets.  */
@@ -20472,6 +20495,8 @@ MIPS options:\n\
 --[no-]relax-branch	[dis]allow out-of-range branches to be relaxed\n\
 -mignore-branch-isa	accept invalid branches requiring an ISA mode switch\n\
 -mno-ignore-branch-isa	reject invalid branches requiring an ISA mode switch\n\
+-mbranch-relocs		emit relocations for branches to external symbols\n\
+-mno-branch-relocs	resolve same-section branch targets without relocations\n\
 -mnan=ENCODING		select an IEEE 754 NaN encoding convention, either of:\n"));
 
   first = 1;

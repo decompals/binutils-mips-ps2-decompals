@@ -568,6 +568,14 @@ for branches.
 By default @samp{-mno-ignore-branch-isa} is selected, causing any invalid
 branch requiring a transition between ISA modes to produce an error.
 
+@item -mbranch-relocs
+@itemx -mno-branch-relocs
+Emit relocations for branches to external symbols, or resolve branch
+targets in the same section without relocations when possible.
+
+By default @samp{-mbranch-relocs} is selected, preserving normal ELF
+semantics for branches to external symbols.
+
 @cindex @option{-mnan=} command-line option, MIPS
 @item -mnan=@var{encoding}
 This option indicates whether the source code uses the IEEE 2008
