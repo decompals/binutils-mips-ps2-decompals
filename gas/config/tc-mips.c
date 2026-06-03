@@ -15546,8 +15546,7 @@ mips_force_relocation (fixS *fixp)
       if (mips_branch_relocs
 	  || fixp->fx_r_type != BFD_RELOC_16_PCREL_S2
 	  || fixp->fx_addsy == NULL
-	  || S_FORCE_RELOC (fixp->fx_addsy, 0)
-	  || S_IS_WEAK (fixp->fx_addsy))
+	  || S_FORCE_RELOC (fixp->fx_addsy, 0))
 	return 1;
     }
 

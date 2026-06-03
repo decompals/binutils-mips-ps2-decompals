@@ -644,6 +644,7 @@ if { [istarget mips*-*-vxworks*] } {
     run_dump_test "branch-weak-5"
     run_dump_test "branch-weak-6"
     run_dump_test "branch-weak-7"
+    run_dump_test "branch-weak-8"
     run_dump_test "branch-local-1"
     run_dump_test "branch-local-2"
     run_dump_test "branch-local-ignore-2"
