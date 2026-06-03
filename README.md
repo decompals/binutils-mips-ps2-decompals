@@ -26,3 +26,6 @@ to check the latest release.
   - Allows to override the alignment of any given section.
   - Up to 16 sections can be specified by passing the flag multiple times.
   - If a section is specified more than once then the last alignment is used.
+- Flag to control MIPS branch relocations.
+  - Syntax is `-mbranch-relocs` and `-mno-branch-relocs`.
+  - Allows same section MIPS PC16 branch targets to be resolved without emitting `R_MIPS_PC16` relocations when possible.
