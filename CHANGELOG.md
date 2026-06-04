@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.10] - 2026-06-03
+
+### Added
+
+- Add `-mbranch-relocs` and `-mno-branch-relocs` options.
+  - Allows same section MIPS PC16 branch targets to be resolved without emitting `R_MIPS_PC16` relocations when possible.
+
 ## [v0.9] - 2026-06-01
 
 ### Added
@@ -84,6 +91,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 - Add support for `R_MIPS15_S3` reloc.
 - Setup Github Action releases.
 
+[v0.10]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.9...v0.10
 [v0.9]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.8...v0.9
 [v0.8]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.7...v0.8
 [v0.7]: https://github.com/decompals/binutils-mips-ps2-decompals/compare/v0.6...v0.7

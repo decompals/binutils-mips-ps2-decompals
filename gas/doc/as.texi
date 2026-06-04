@@ -456,6 +456,7 @@ gcc(1), ld(1), and the Info entries for @file{binutils} and @file{ld}.
    [@b{-mips64r3}] [@b{-mips64r5}] [@b{-mips64r6}]
    [@b{-construct-floats}] [@b{-no-construct-floats}]
    [@b{-mignore-branch-isa}] [@b{-mno-ignore-branch-isa}]
+   [@b{-mbranch-relocs}] [@b{-mno-branch-relocs}]
    [@b{-mnan=@var{encoding}}]
    [@b{-trap}] [@b{-no-break}] [@b{-break}] [@b{-no-trap}]
    [@b{-mips16}] [@b{-no-mips16}]
@@ -1743,6 +1744,12 @@ checks implemented that verify in branch assembly that the two ISA
 modes match.  @samp{-mignore-branch-isa} disables these checks.  By
 default @samp{-mno-ignore-branch-isa} is selected, causing any invalid
 branch requiring a transition between ISA modes to produce an error.
+
+@item -mbranch-relocs
+@itemx -mno-branch-relocs
+Emit relocations for branches to external symbols, or resolve branch
+targets in the same section without relocations when possible.  By
+default @samp{-mbranch-relocs} is selected.
 
 @item -mnan=@var{encoding}
 Select between the IEEE 754-2008 (@option{-mnan=2008}) or the legacy

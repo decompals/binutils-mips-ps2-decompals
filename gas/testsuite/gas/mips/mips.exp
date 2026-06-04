@@ -595,6 +595,7 @@ if { [istarget mips*-*-vxworks*] } {
     run_dump_test_arches "branch-likely" [mips_arch_list_matching mips2 !mips32r6]
     run_dump_test_arches "branch-misc-1" [mips_arch_list_matching mips1]
     run_dump_test_arches "branch-misc-2" [mips_arch_list_matching mips1]
+    run_dump_test_arches "branch-misc-2-no-branch-relocs" [mips_arch_list_matching mips1]
     run_dump_test_arches "branch-misc-2pic" [mips_arch_list_matching mips1]
     run_dump_test "branch-misc-3"
     run_dump_test_arches "branch-misc-4" [mips_arch_list_matching mips1]
@@ -643,6 +644,7 @@ if { [istarget mips*-*-vxworks*] } {
     run_dump_test "branch-weak-5"
     run_dump_test "branch-weak-6"
     run_dump_test "branch-weak-7"
+    run_dump_test "branch-weak-8"
     run_dump_test "branch-local-1"
     run_dump_test "branch-local-2"
     run_dump_test "branch-local-ignore-2"
