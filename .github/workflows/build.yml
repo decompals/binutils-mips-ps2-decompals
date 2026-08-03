@@ -10,25 +10,28 @@ jobs:
       matrix:
         TARGET:
           - {
-              OS: 'ubuntu-latest',
-              CFLAGS: '-static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              OS: 'ubuntu-22.04',
+              CONFIGURE_FLAGS: '',
+              CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              LDFLAGS: '',
               HOST: 'i386-pc-linux',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz',
             }
           - {
               OS: 'macos-latest',
+              CONFIGURE_FLAGS: --with-system-zlib --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2,
               CFLAGS: '',
+              LDFLAGS: '',
               HOST: 'aarch64-apple-darwin',
-              BUILD: 'aarch64-apple-darwin',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz',
             }
           - {
               OS: 'windows-latest',
+              CONFIGURE_FLAGS: --disable-gprof --disable-nls --without-zstd,
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
               LDFLAGS: '-static -static-libgcc -static-libstdc++',
               HOST: 'x86_64-w64-mingw32',
-              MSYSTEM: 'MINGW64',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip',
             }
 
     name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
@@ -38,7 +41,7 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.OS == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bison libmpfr-dev
@@ -54,31 +57,25 @@ jobs:
         uses: msys2/setup-msys2@v2
         if: matrix.TARGET.OS == 'windows-latest'
         with:
-          msystem: ${{ matrix.TARGET.MSYSTEM }}
+          msystem: MINGW64
           install: bison diffutils file flex gawk make patch perl texinfo zip
           pacboy: toolchain:p
 
-      - name: Configure for mips (Ubuntu)
+      - name: Configure for mips
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.OS != 'windows-latest'
         run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
-
-      - name: Configure for mips (macOS)
-        shell: bash
-        if: matrix.TARGET.OS == 'macos-latest'
-        run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --with-system-zlib --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Configure for mips (Windows)
         shell: msys2 {0}
         if: matrix.TARGET.OS == 'windows-latest'
         run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprof --disable-gprofng --disable-gdb --disable-werror --disable-nls --without-zstd --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Make
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.OS == 'ubuntu-22.04'
         run: |
           make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}"
 
