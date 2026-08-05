@@ -12,7 +12,6 @@ jobs:
           - {
               NAME: 'linux',
               OS: 'ubuntu-22.04',
-              SHELL: bash,
               NPROC: nproc,
               CONFIGURE_FLAGS: '',
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
@@ -24,7 +23,6 @@ jobs:
           - {
               NAME: 'mac',
               OS: 'macos-latest',
-              SHELL: bash,
               NPROC: nproc,
               CONFIGURE_FLAGS: --with-system-zlib --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2,
               CFLAGS: '',
@@ -36,7 +34,6 @@ jobs:
           - {
               NAME: 'windows',
               OS: 'windows-latest',
-              SHELL: 'msys2 {0}',
               NPROC: nproc,
               CONFIGURE_FLAGS: --disable-gprof --disable-nls --without-zstd,
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
@@ -52,14 +49,14 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies (Ubuntu)
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
         if: matrix.TARGET.OS == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bison libmpfr-dev
 
       - name: Install dependencies (macOS)
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
         if: matrix.TARGET.OS == 'macos-latest'
         run: |
           brew update
@@ -73,32 +70,47 @@ jobs:
           install: bison diffutils file flex gawk make patch perl texinfo zip
           pacboy: toolchain:p
 
+      # Duplicated because GHA doesn't allow using shell from the matrix
       - name: Configure for mips
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
+        if: matrix.TARGET.OS != 'windows-latest'
+        run: |
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
+
+      - name: Configure for mips (Windows)
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
         run: |
           ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Make
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
+        if: matrix.TARGET.OS != 'windows-latest'
+        run: |
+          make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
+
+      - name: Make
+        shell: msys2 {0}
+        if: matrix.TARGET.OS == 'windows-latest'
         run: |
           make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
       - name: Test for file
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
         if: matrix.TARGET.OS != 'windows-latest'
         run: |
           test -f binutils/ar
           file binutils/ar
 
       - name: Test for file (Windows)
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: msys2 {0}
         if: matrix.TARGET.OS == 'windows-latest'
         run: |
           test -f binutils/ar.exe
           file binutils/ar.exe
 
       - name: Create release archive
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: bash
         if: matrix.TARGET.OS != 'windows-latest'
         run: |
           mkdir -p release
@@ -121,7 +133,7 @@ jobs:
           cd release && tar -czf ../${{ matrix.TARGET.ARCHIVE_NAME }} *
 
       - name: Create release archive (Windows)
-        shell: ${{ matrix.TARGET.SHELL }}
+        shell: msys2 {0}
         if: matrix.TARGET.OS == 'windows-latest'
         run: |
           mkdir -p release
