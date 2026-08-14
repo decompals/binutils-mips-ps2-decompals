@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ## [Unreleased]
 
+## [v0.11] - 2026-08-13
+
+### Changed
+
+- Downgrade CI runner for linux builds so the prebuilt binaries can run on older
+  distros.
+- And other CI cleanups.
+
 ## [v0.10] - 2026-06-03
 
 ### Added

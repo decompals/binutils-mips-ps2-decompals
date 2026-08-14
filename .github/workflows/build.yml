@@ -4,113 +4,114 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ${{ matrix.TARGET.OS }}
+    runs-on: ${{ matrix.TARGET.RUNNER }}
     strategy:
       fail-fast: false
       matrix:
         TARGET:
           - {
-              OS: 'ubuntu-latest',
-              CFLAGS: '-static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              NAME: 'linux',
+              RUNNER: 'ubuntu-22.04',
+              NPROC: nproc,
+              CONFIGURE_FLAGS: '',
+              CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
+              LDFLAGS: '',
+              MAKEFLAGS: '',
               HOST: 'i386-pc-linux',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-linux-x86-64.tar.gz',
             }
           - {
-              OS: 'macos-latest',
+              NAME: 'mac',
+              RUNNER: 'macos-latest',
+              NPROC: 'sysctl -n hw.ncpu',
+              CONFIGURE_FLAGS: --with-system-zlib --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2,
               CFLAGS: '',
+              LDFLAGS: '',
+              MAKEFLAGS: '',
               HOST: 'aarch64-apple-darwin',
-              BUILD: 'aarch64-apple-darwin',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-macos-arm64.tar.gz',
             }
           - {
-              OS: 'windows-latest',
+              NAME: 'windows',
+              RUNNER: 'windows-latest',
+              NPROC: nproc,
+              CONFIGURE_FLAGS: --disable-gprof --disable-nls --without-zstd,
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
               LDFLAGS: '-static -static-libgcc -static-libstdc++',
+              MAKEFLAGS: 'MAKEINFO=true',
               HOST: 'x86_64-w64-mingw32',
-              MSYSTEM: 'MINGW64',
-              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip'
+              ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip',
             }
 
-    name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
+    name: Building binutils for ${{ matrix.TARGET.RUNNER }} ${{ matrix.TARGET.HOST }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Install dependencies (Ubuntu)
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.NAME == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bison libmpfr-dev
 
       - name: Install dependencies (macOS)
         shell: bash
-        if: matrix.TARGET.OS == 'macos-latest'
+        if: matrix.TARGET.NAME == 'mac'
         run: |
           brew update
           brew install bison texinfo
 
       - name: Install dependencies (Windows)
         uses: msys2/setup-msys2@v2
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         with:
-          msystem: ${{ matrix.TARGET.MSYSTEM }}
+          msystem: MINGW64
           install: bison diffutils file flex gawk make patch perl texinfo zip
           pacboy: toolchain:p
 
-      - name: Configure for mips (Ubuntu)
+      # Duplicated because GHA doesn't allow using shell from the matrix
+      - name: Configure for mips
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
-
-      - name: Configure for mips (macOS)
-        shell: bash
-        if: matrix.TARGET.OS == 'macos-latest'
-        run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --with-system-zlib --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Configure for mips (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
-          ./configure --target=mips --prefix=/opt/cross --disable-gprof --disable-gprofng --disable-gdb --disable-werror --disable-nls --without-zstd --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }}
+          ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Make
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
-          make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}"
+          make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
-      - name: Make
-        shell: bash
-        if: matrix.TARGET.OS == 'macos-latest'
-        run: |
-          make -j $(sysctl -n hw.ncpu)
-
-      - name: Make
+      - name: Make (windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
-          make -j $(nproc) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" MAKEINFO=true
+          make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
       - name: Test for file
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           test -f binutils/ar
           file binutils/ar
 
       - name: Test for file (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           test -f binutils/ar.exe
           file binutils/ar.exe
 
       - name: Create release archive
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           mkdir -p release
           cp binutils/addr2line release/mips-ps2-decompals-addr2line
@@ -133,7 +134,7 @@ jobs:
 
       - name: Create release archive (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           mkdir -p release
           cp binutils/addr2line.exe release/mips-ps2-decompals-addr2line.exe
@@ -156,7 +157,7 @@ jobs:
       - name: Upload archive
         uses: actions/upload-artifact@v4
         with:
-          name: binutils-mips-ps2-decompals-${{ matrix.TARGET.OS }}-${{ matrix.TARGET.HOST }}
+          name: binutils-mips-ps2-decompals-${{ matrix.TARGET.NAME }}-${{ matrix.TARGET.HOST }}
           path: |
             ${{ matrix.TARGET.ARCHIVE_NAME }}
 
