@@ -50,21 +50,21 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         shell: bash
-        if: matrix.TARGET.OS == 'ubuntu-22.04'
+        if: matrix.TARGET.NAME == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential bison libmpfr-dev
 
       - name: Install dependencies (macOS)
         shell: bash
-        if: matrix.TARGET.OS == 'macos-latest'
+        if: matrix.TARGET.NAME == 'mac'
         run: |
           brew update
           brew install bison texinfo
 
       - name: Install dependencies (Windows)
         uses: msys2/setup-msys2@v2
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         with:
           msystem: MINGW64
           install: bison diffutils file flex gawk make patch perl texinfo zip
@@ -73,45 +73,45 @@ jobs:
       # Duplicated because GHA doesn't allow using shell from the matrix
       - name: Configure for mips
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Configure for mips (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           ./configure --target=mips --prefix=/opt/cross --disable-gprofng --disable-gdb --disable-werror --host=${{ matrix.TARGET.HOST }} --build=${{ matrix.TARGET.HOST }} ${{ matrix.TARGET.CONFIGURE_FLAGS }}
 
       - name: Make
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
       - name: Make
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
       - name: Test for file
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           test -f binutils/ar
           file binutils/ar
 
       - name: Test for file (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           test -f binutils/ar.exe
           file binutils/ar.exe
 
       - name: Create release archive
         shell: bash
-        if: matrix.TARGET.OS != 'windows-latest'
+        if: matrix.TARGET.NAME != 'windows'
         run: |
           mkdir -p release
           cp binutils/addr2line release/mips-ps2-decompals-addr2line
@@ -134,7 +134,7 @@ jobs:
 
       - name: Create release archive (Windows)
         shell: msys2 {0}
-        if: matrix.TARGET.OS == 'windows-latest'
+        if: matrix.TARGET.NAME == 'windows'
         run: |
           mkdir -p release
           cp binutils/addr2line.exe release/mips-ps2-decompals-addr2line.exe
