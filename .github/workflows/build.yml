@@ -11,7 +11,7 @@ jobs:
         TARGET:
           - {
               NAME: 'linux',
-              OS: 'ubuntu-22.04',
+              RUNNER: 'ubuntu-22.04',
               NPROC: nproc,
               CONFIGURE_FLAGS: '',
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
@@ -22,8 +22,8 @@ jobs:
             }
           - {
               NAME: 'mac',
-              OS: 'macos-latest',
-              NPROC: nproc,
+              RUNNER: 'macos-latest',
+              NPROC: 'sysctl -n hw.ncpu',
               CONFIGURE_FLAGS: --with-system-zlib --with-gmp=/opt/homebrew/Cellar/gmp/6.3.0 --with-mpfr=/opt/homebrew/Cellar/mpfr/4.2.2,
               CFLAGS: '',
               LDFLAGS: '',
@@ -33,7 +33,7 @@ jobs:
             }
           - {
               NAME: 'windows',
-              OS: 'windows-latest',
+              RUNNER: 'windows-latest',
               NPROC: nproc,
               CONFIGURE_FLAGS: --disable-gprof --disable-nls --without-zstd,
               CFLAGS: '-O2 -static -fno-stack-protector -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0',
@@ -43,7 +43,7 @@ jobs:
               ARCHIVE_NAME: 'binutils-mips-ps2-decompals-windows-x86-64.zip',
             }
 
-    name: Building binutils for ${{ matrix.TARGET.OS }} ${{ matrix.TARGET.HOST }}
+    name: Building binutils for ${{ matrix.TARGET.RUNNER }} ${{ matrix.TARGET.HOST }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
         run: |
           make -j $(${{ matrix.TARGET.NPROC }}) CFLAGS="${{ matrix.TARGET.CFLAGS }}" LDFLAGS="${{ matrix.TARGET.LDFLAGS }}" ${{ matrix.TARGET.MAKEFLAGS }}
 
-      - name: Make
+      - name: Make (windows)
         shell: msys2 {0}
         if: matrix.TARGET.NAME == 'windows'
         run: |
